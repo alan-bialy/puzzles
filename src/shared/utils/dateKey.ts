@@ -5,3 +5,12 @@ export function getLocalDateKey(date = new Date()) {
 
   return `${year}-${month}-${day}`
 }
+
+export function getPreviousDateKey(dateKey: string) {
+  const [year, month, day] = dateKey.split('-').map(Number)
+
+  const date = new Date(Date.UTC(year, month - 1, day))
+  date.setUTCDate(date.getUTCDate() - 1)
+
+  return date.toISOString().slice(0, 10)
+}
