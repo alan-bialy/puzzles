@@ -1,8 +1,8 @@
 import type { AppLanguage } from '../../../app/providers/SettingsContext'
 import { getPreviousDateKey } from '../../../shared/utils/dateKey'
+import { MAX_ATTEMPTS } from '../constants'
 
 const STORAGE_VERSION = 1
-const MAX_ATTEMPTS = 6
 
 export type StoredWordleResult = {
   won: boolean

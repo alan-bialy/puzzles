@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AppLanguage } from "../../../app/providers/SettingsContext";
 import { getLocalDateKey } from "../../../shared/utils/dateKey";
 import { normalizeWord } from "../../../shared/utils/normalizeWord";
@@ -18,9 +18,11 @@ import type {
   WordleGameResult,
   WordleMessage,
 } from "../types";
-
-const WORD_LENGTH = 5;
-const MAX_ATTEMPTS = 6;
+import {
+  BOARD_REVEAL_DURATION_MS,
+  MAX_ATTEMPTS,
+  WORD_LENGTH,
+} from "../constants";
 
 type LoadStatus = "idle" | "loading" | "loaded" | "error";
 type UseWordleGameOptions = {
@@ -102,6 +104,26 @@ export function useWordleGame(
   const [currentGuess, setCurrentGuess] = useState("");
   const [status, setStatus] = useState<GameStatus>("playing");
   const [message, setMessage] = useState<WordleMessage>(null);
+
+  const [revealingRowIndex, setRevealingRowIndex] = useState<number | null>(
+    null,
+  );
+  const [winningRowIndex, setWinningRowIndex] = useState<number | null>(null);
+  const [shakeNonce, setShakeNonce] = useState(0);
+  const revealTimerRef = useRef<number | null>(null);
+  const clearRevealTimer = useCallback(() => {
+    if (revealTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(revealTimerRef.current);
+    revealTimerRef.current = null;
+  }, []);
+  useEffect(() => {
+    return () => {
+      clearRevealTimer();
+    };
+  }, [clearRevealTimer]);
 
   useEffect(() => {
     let isActive = true;
@@ -195,7 +217,7 @@ export function useWordleGame(
 
   const addLetter = useCallback(
     (letter: string) => {
-      if (status !== "playing") {
+      if (status !== "playing" || revealingRowIndex !== null) {
         return;
       }
 
@@ -209,21 +231,26 @@ export function useWordleGame(
         return normalizeWord(`${guess}${letter}`);
       });
     },
-    [status],
+    [revealingRowIndex, status],
   );
 
   const removeLetter = useCallback(() => {
-    if (status !== "playing") {
+    if (status !== "playing" || revealingRowIndex !== null) {
       return;
     }
 
     setMessage(null);
 
     setCurrentGuess((guess) => Array.from(guess).slice(0, -1).join(""));
-  }, [status]);
+  }, [revealingRowIndex, status]);
 
   const submitGuess = useCallback(() => {
-    if (!dictionary || !answer || status !== "playing") {
+    if (
+      !dictionary ||
+      !answer ||
+      status !== "playing" ||
+      revealingRowIndex !== null
+    ) {
       return;
     }
 
@@ -231,11 +258,15 @@ export function useWordleGame(
 
     if (Array.from(normalizedGuess).length !== WORD_LENGTH) {
       setMessage({ type: "too-short" });
+      setShakeNonce((current) => current + 1);
       return;
     }
 
     if (!dictionary.allowed.has(normalizedGuess)) {
-      setMessage({ type: "not-in-dictionary" });
+      setMessage({
+        type: "not-in-dictionary",
+      });
+      setShakeNonce((current) => current + 1);
       return;
     }
 
@@ -243,48 +274,73 @@ export function useWordleGame(
 
     const nextGuesses = [...guesses, evaluation];
 
+    const revealedRowIndex = guesses.length;
+    const hasWon = normalizedGuess === answer;
+    const hasLost = !hasWon && nextGuesses.length >= MAX_ATTEMPTS;
+
     setGuesses(nextGuesses);
     setCurrentGuess("");
-
-    if (normalizedGuess === answer) {
-      setStatus("won");
-      setMessage({ type: "won" });
-
-      onComplete?.({
-        dateKey: gameDateKey,
-        won: true,
-        attempts: nextGuesses.length,
-      });
-
-      return;
-    }
-
-    if (nextGuesses.length >= MAX_ATTEMPTS) {
-      setStatus("lost");
-      setMessage({
-        type: "lost",
-        answer,
-      });
-
-      onComplete?.({
-        dateKey: gameDateKey,
-        won: false,
-        attempts: nextGuesses.length,
-      });
-
-      return;
-    }
-
     setMessage(null);
-  }, [answer, currentGuess, dictionary, guesses, gameDateKey, onComplete, status]);
+    setRevealingRowIndex(revealedRowIndex);
+
+    clearRevealTimer();
+
+    revealTimerRef.current = window.setTimeout(() => {
+      revealTimerRef.current = null;
+      setRevealingRowIndex(null);
+
+      if (hasWon) {
+        setStatus("won");
+        setMessage({ type: "won" });
+        setWinningRowIndex(revealedRowIndex);
+
+        onComplete?.({
+          dateKey: gameDateKey,
+          won: true,
+          attempts: nextGuesses.length,
+        });
+
+        return;
+      }
+
+      if (hasLost) {
+        setStatus("lost");
+        setMessage({
+          type: "lost",
+          answer,
+        });
+
+        onComplete?.({
+          dateKey: gameDateKey,
+          won: false,
+          attempts: nextGuesses.length,
+        });
+      }
+    }, BOARD_REVEAL_DURATION_MS);
+  }, [
+    answer,
+    clearRevealTimer,
+    currentGuess,
+    dictionary,
+    gameDateKey,
+    guesses,
+    onComplete,
+    revealingRowIndex,
+    status,
+  ]);
 
   const resetGame = useCallback(() => {
+    clearRevealTimer();
     clearWordleState(language);
+
     setGuesses([]);
     setCurrentGuess("");
     setStatus("playing");
     setMessage(null);
-  }, [language]);
+    setRevealingRowIndex(null);
+    setWinningRowIndex(null);
+    setShakeNonce(0);
+  }, [clearRevealTimer, language]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -328,6 +384,12 @@ export function useWordleGame(
     loadStatus,
     wordLength: WORD_LENGTH,
     maxAttempts: MAX_ATTEMPTS,
+
+    revealingRowIndex,
+    winningRowIndex,
+    shakeNonce,
+    isInputLocked: revealingRowIndex !== null,
+
     addLetter,
     removeLetter,
     submitGuess,

@@ -82,6 +82,10 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
     loadStatus,
     wordLength,
     maxAttempts,
+    revealingRowIndex,
+    winningRowIndex,
+    shakeNonce,
+    isInputLocked,
     addLetter,
     removeLetter,
     submitGuess,
@@ -174,6 +178,9 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
         currentGuess={currentGuess}
         maxAttempts={maxAttempts}
         wordLength={wordLength}
+        revealingRowIndex={revealingRowIndex}
+        winningRowIndex={winningRowIndex}
+        shakeNonce={shakeNonce}
       />
 
       <div
@@ -189,7 +196,7 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
         onLetter={addLetter}
         onBackspace={removeLetter}
         onEnter={submitGuess}
-        disabled={status !== "playing"}
+        disabled={status !== "playing" || isInputLocked}
       />
 
       <div className="mx-auto mt-6 flex items-center justify-center gap-2">
