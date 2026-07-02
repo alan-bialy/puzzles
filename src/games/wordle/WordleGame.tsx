@@ -84,7 +84,7 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
     maxAttempts,
     revealingRowIndex,
     winningRowIndex,
-    shakeNonce,
+    shakeState,
     isInputLocked,
     addLetter,
     removeLetter,
@@ -180,9 +180,8 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
         wordLength={wordLength}
         revealingRowIndex={revealingRowIndex}
         winningRowIndex={winningRowIndex}
-        shakeNonce={shakeNonce}
+        shakeState={shakeState}
       />
-
       <div
         aria-live="polite"
         className="mt-4 min-h-7 text-center text-sm font-bold text-(--color-muted)"

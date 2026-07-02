@@ -1,15 +1,3 @@
-// export const WORD_LENGTH = 5
-// export const MAX_ATTEMPTS = 6
-
-// export const TILE_REVEAL_DELAY_MS = 180
-// export const TILE_FLIP_DURATION_MS = 500
-
-// export const BOARD_REVEAL_DURATION_MS =
-//   (WORD_LENGTH - 1) * TILE_REVEAL_DELAY_MS +
-//   TILE_FLIP_DURATION_MS
-
-// export const TILE_WIN_DELAY_MS = 80
-
 export const WORD_LENGTH = 5
 export const MAX_ATTEMPTS = 6
 

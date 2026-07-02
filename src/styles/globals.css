@@ -71,63 +71,113 @@ select {
   -webkit-tap-highlight-color: transparent;
 }
 
-.wordle-tile-shell {
-  perspective: 700px;
-}
+.wordle-tile {
+  --wordle-result-color: var(--color-absent);
 
-.wordle-tile-card {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-}
-
-.wordle-tile-face {
-  position: absolute;
-  inset: 0;
   display: grid;
   place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid var(--color-tile-border);
+  border-radius: 0.75rem;
+  background: var(--color-tile-empty);
+  color: var(--color-text);
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+
+  transform-origin: center;
+  transform-style: preserve-3d;
   backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  will-change: transform, background-color, border-color;
 }
 
-.wordle-tile-back {
-  transform: rotateX(180deg);
+.wordle-tile--filled {
+  border-color: var(--color-text);
 }
 
-.wordle-tile-flipped {
-  transform: rotateX(180deg);
+.wordle-tile--correct {
+  --wordle-result-color: var(--color-correct);
 }
 
-.wordle-tile-flip {
-  animation: wordle-flip 500ms cubic-bezier(0.4, 0, 0.2, 1)
-    var(--wordle-reveal-delay, 0ms) forwards;
+.wordle-tile--present {
+  --wordle-result-color: var(--color-present);
 }
 
-.wordle-tile-pop {
-  animation: wordle-pop 120ms ease-out;
+.wordle-tile--absent {
+  --wordle-result-color: var(--color-absent);
+}
+
+.wordle-tile--resolved {
+  border-color: var(--wordle-result-color);
+  background: var(--wordle-result-color);
+  color: white;
+}
+
+.wordle-tile--pop {
+  animation: wordle-pop 180ms cubic-bezier(0.2, 0.9, 0.35, 1.4);
+}
+
+.wordle-tile--revealing {
+  animation: wordle-reveal 650ms cubic-bezier(0.4, 0, 0.2, 1)
+    var(--wordle-reveal-delay, 0ms) both;
+}
+
+.wordle-tile--bounce {
+  animation: wordle-bounce 650ms cubic-bezier(0.2, 0.8, 0.3, 1.25)
+    var(--wordle-win-delay, 0ms) both;
 }
 
 .wordle-row-shake {
-  animation: wordle-shake 420ms ease-in-out;
-}
-
-.wordle-tile-bounce {
-  animation: wordle-bounce 450ms ease
-    var(--wordle-win-delay, 0ms) both;
+  animation: wordle-shake 520ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 @keyframes wordle-pop {
   0% {
-    transform: scale(0.82);
+    transform: scale(0.7);
   }
 
   55% {
-    transform: scale(1.08);
+    transform: scale(1.14);
+  }
+
+  75% {
+    transform: scale(0.96);
   }
 
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes wordle-reveal {
+  0% {
+    transform: rotateX(0deg) scale(1);
+    border-color: var(--color-text);
+    background: var(--color-tile-empty);
+    color: var(--color-text);
+  }
+
+  45% {
+    transform: rotateX(90deg) scale(0.92);
+    border-color: var(--color-text);
+    background: var(--color-tile-empty);
+    color: var(--color-text);
+  }
+
+  55% {
+    transform: rotateX(90deg) scale(0.92);
+    border-color: var(--wordle-result-color);
+    background: var(--wordle-result-color);
+    color: white;
+  }
+
+  100% {
+    transform: rotateX(0deg) scale(1);
+    border-color: var(--wordle-result-color);
+    background: var(--wordle-result-color);
+    color: white;
   }
 }
 
@@ -137,71 +187,74 @@ select {
     transform: translateX(0);
   }
 
-  15% {
-    transform: translateX(-8px);
+  10% {
+    transform: translateX(-12px) rotate(-1deg);
+  }
+
+  20% {
+    transform: translateX(12px) rotate(1deg);
   }
 
   30% {
-    transform: translateX(7px);
+    transform: translateX(-10px);
   }
 
-  45% {
-    transform: translateX(-6px);
+  40% {
+    transform: translateX(10px);
+  }
+
+  50% {
+    transform: translateX(-7px);
   }
 
   60% {
-    transform: translateX(5px);
+    transform: translateX(7px);
   }
 
   75% {
     transform: translateX(-3px);
   }
-}
 
-@keyframes wordle-flip {
-  0% {
-    transform: rotateX(0deg);
-  }
-
-  45% {
-    transform: rotateX(90deg);
-  }
-
-  55% {
-    transform: rotateX(90deg);
-  }
-
-  100% {
-    transform: rotateX(180deg);
+  90% {
+    transform: translateX(3px);
   }
 }
 
 @keyframes wordle-bounce {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 
-  45% {
-    transform: translateY(-12px);
+  22% {
+    transform: translateY(-20px) scale(1.08);
   }
 
-  65% {
-    transform: translateY(3px);
+  40% {
+    transform: translateY(0) scale(0.97);
   }
 
-  80% {
-    transform: translateY(-4px);
+  58% {
+    transform: translateY(-10px) scale(1.04);
+  }
+
+  75% {
+    transform: translateY(0) scale(0.99);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .wordle-tile-flip,
-  .wordle-tile-pop,
-  .wordle-row-shake,
-  .wordle-tile-bounce {
+@media (min-width: 640px) {
+  .wordle-tile {
+    font-size: 1.875rem;
+  }
+}
+
+/* @media (prefers-reduced-motion: reduce) {
+  .wordle-tile--pop,
+  .wordle-tile--revealing,
+  .wordle-tile--bounce,
+  .wordle-row-shake {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
   }
-}
-
+} */

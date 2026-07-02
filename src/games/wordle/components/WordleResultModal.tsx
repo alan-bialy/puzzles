@@ -118,7 +118,7 @@ export function WordleResultModal({
             )}
           </div>
 
-          <div className="mt-8 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2">
             {status !== "playing" && (
               <button
                 type="button"
@@ -135,13 +135,13 @@ export function WordleResultModal({
               </button>
             )}
 
-            <button
+            {/* <button
               type="button"
               onClick={onClose}
               className="w-full rounded-full bg-(--color-text) px-5 py-3 text-sm font-black text-(--color-bg) transition hover:scale-[1.01]"
             >
               {text.close}
-            </button>
+            </button> */}
           </div>
           {/* <button
             type="button"

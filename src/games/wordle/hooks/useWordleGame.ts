@@ -20,6 +20,7 @@ import type {
 } from "../types";
 import {
   BOARD_REVEAL_DURATION_MS,
+  WIN_CELEBRATION_DURATION_MS,
   MAX_ATTEMPTS,
   WORD_LENGTH,
 } from "../constants";
@@ -108,22 +109,34 @@ export function useWordleGame(
   const [revealingRowIndex, setRevealingRowIndex] = useState<number | null>(
     null,
   );
+  const completionTimerRef = useRef<number | null>(null);
+
   const [winningRowIndex, setWinningRowIndex] = useState<number | null>(null);
-  const [shakeNonce, setShakeNonce] = useState(0);
+
+  type ShakeState = {
+    rowIndex: number;
+    nonce: number;
+  };
+
+  const [shakeState, setShakeState] = useState<ShakeState | null>(null);
+
   const revealTimerRef = useRef<number | null>(null);
-  const clearRevealTimer = useCallback(() => {
-    if (revealTimerRef.current === null) {
-      return;
+  const clearAnimationTimers = useCallback(() => {
+    if (revealTimerRef.current !== null) {
+      window.clearTimeout(revealTimerRef.current);
+      revealTimerRef.current = null;
     }
 
-    window.clearTimeout(revealTimerRef.current);
-    revealTimerRef.current = null;
+    if (completionTimerRef.current !== null) {
+      window.clearTimeout(completionTimerRef.current);
+      completionTimerRef.current = null;
+    }
   }, []);
   useEffect(() => {
     return () => {
-      clearRevealTimer();
+      clearAnimationTimers();
     };
-  }, [clearRevealTimer]);
+  }, [clearAnimationTimers]);
 
   useEffect(() => {
     let isActive = true;
@@ -258,7 +271,12 @@ export function useWordleGame(
 
     if (Array.from(normalizedGuess).length !== WORD_LENGTH) {
       setMessage({ type: "too-short" });
-      setShakeNonce((current) => current + 1);
+
+      setShakeState((current) => ({
+        rowIndex: guesses.length,
+        nonce: (current?.nonce ?? 0) + 1,
+      }));
+
       return;
     }
 
@@ -266,7 +284,12 @@ export function useWordleGame(
       setMessage({
         type: "not-in-dictionary",
       });
-      setShakeNonce((current) => current + 1);
+
+      setShakeState((current) => ({
+        rowIndex: guesses.length,
+        nonce: (current?.nonce ?? 0) + 1,
+      }));
+
       return;
     }
 
@@ -274,16 +297,20 @@ export function useWordleGame(
 
     const nextGuesses = [...guesses, evaluation];
 
-    const revealedRowIndex = guesses.length;
+    const revealedRowIndex = nextGuesses.length - 1;
+
     const hasWon = normalizedGuess === answer;
+
     const hasLost = !hasWon && nextGuesses.length >= MAX_ATTEMPTS;
 
+    setWinningRowIndex(null);
+    setShakeState(null)
     setGuesses(nextGuesses);
     setCurrentGuess("");
     setMessage(null);
     setRevealingRowIndex(revealedRowIndex);
 
-    clearRevealTimer();
+    clearAnimationTimers();
 
     revealTimerRef.current = window.setTimeout(() => {
       revealTimerRef.current = null;
@@ -294,11 +321,15 @@ export function useWordleGame(
         setMessage({ type: "won" });
         setWinningRowIndex(revealedRowIndex);
 
-        onComplete?.({
-          dateKey: gameDateKey,
-          won: true,
-          attempts: nextGuesses.length,
-        });
+        completionTimerRef.current = window.setTimeout(() => {
+          completionTimerRef.current = null;
+
+          onComplete?.({
+            dateKey: gameDateKey,
+            won: true,
+            attempts: nextGuesses.length,
+          });
+        }, WIN_CELEBRATION_DURATION_MS);
 
         return;
       }
@@ -319,7 +350,7 @@ export function useWordleGame(
     }, BOARD_REVEAL_DURATION_MS);
   }, [
     answer,
-    clearRevealTimer,
+    clearAnimationTimers,
     currentGuess,
     dictionary,
     gameDateKey,
@@ -330,7 +361,7 @@ export function useWordleGame(
   ]);
 
   const resetGame = useCallback(() => {
-    clearRevealTimer();
+    clearAnimationTimers();
     clearWordleState(language);
 
     setGuesses([]);
@@ -339,8 +370,8 @@ export function useWordleGame(
     setMessage(null);
     setRevealingRowIndex(null);
     setWinningRowIndex(null);
-    setShakeNonce(0);
-  }, [clearRevealTimer, language]);
+    setShakeState(null);
+  }, [clearAnimationTimers, language]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -387,7 +418,7 @@ export function useWordleGame(
 
     revealingRowIndex,
     winningRowIndex,
-    shakeNonce,
+    shakeState,
     isInputLocked: revealingRowIndex !== null,
 
     addLetter,
