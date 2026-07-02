@@ -1,6 +1,8 @@
 import type { AppLanguage } from "../../app/providers/SettingsContext";
 import { useSettings } from "../../app/providers/SettingsContext";
 import { useCallback, useState } from "react";
+import { buildShareText } from "./engine/buildShareText";
+import type { ShareStatus } from "./components/WordleResultModal";
 import { WordleResultModal } from "./components/WordleResultModal";
 import { useWordleStats } from "./hooks/useWordleStats";
 import { WordleBoard } from "./components/WordleBoard";
@@ -60,16 +62,18 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
   const [isResultOpen, setIsResultOpen] = useState(false);
 
   const { stats, recordResult } = useWordleStats(language);
-
+  const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
   const handleGameComplete = useCallback(
     (result: WordleGameResult) => {
       recordResult(result);
+      setShareStatus("idle");
       setIsResultOpen(true);
     },
     [recordResult],
   );
 
   const {
+    gameDateKey,
     guesses,
     currentGuess,
     usedLetters,
@@ -90,6 +94,46 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
     resetGame();
   }, [resetGame]);
   const messageText = getMessageText(message, language);
+
+  const handleShare = useCallback(async () => {
+    if (status === "playing") {
+      return;
+    }
+
+    const shareText = buildShareText({
+      dateKey: gameDateKey,
+      status,
+      guesses,
+      maxAttempts,
+      language,
+      url: window.location.href,
+    });
+
+    setShareStatus("idle");
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title:
+            language === "pl" ? "Mój wynik w Puzzles" : "My Puzzles result",
+          text: shareText,
+        });
+
+        setShareStatus("success");
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareText);
+
+      setShareStatus("success");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+
+      setShareStatus("error");
+    }
+  }, [gameDateKey, guesses, language, maxAttempts, status]);
 
   if (loadStatus === "loading" || loadStatus === "idle") {
     return (
@@ -151,7 +195,10 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
       <div className="mx-auto mt-6 flex items-center justify-center gap-2">
         <button
           type="button"
-          onClick={() => setIsResultOpen(true)}
+          onClick={() => {
+            setShareStatus("idle");
+            setIsResultOpen(true);
+          }}
           className="rounded-full px-4 py-2 text-xs font-bold text-(--color-muted) transition hover:bg-(--color-surface-strong) hover:text-(--color-text)"
         >
           {language === "pl" ? "Statystyki" : "Statistics"}
@@ -174,6 +221,8 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
         status={status}
         attempts={guesses.length}
         stats={stats}
+        shareStatus={shareStatus}
+        onShare={handleShare}
         onClose={() => setIsResultOpen(false)}
       />
     </section>

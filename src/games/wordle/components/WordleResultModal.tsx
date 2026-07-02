@@ -1,16 +1,20 @@
-import { useEffect } from 'react'
-import type { AppLanguage } from '../../../app/providers/SettingsContext'
-import type { WordleStats } from '../storage/wordleStatsStorage'
-import type { GameStatus } from '../types'
+import { useEffect } from "react";
+import type { AppLanguage } from "../../../app/providers/SettingsContext";
+import type { WordleStats } from "../storage/wordleStatsStorage";
+import type { GameStatus } from "../types";
+
+export type ShareStatus = "idle" | "success" | "error";
 
 type WordleResultModalProps = {
-  open: boolean
-  language: AppLanguage
-  status: GameStatus
-  attempts: number
-  stats: WordleStats
-  onClose: () => void
-}
+  open: boolean;
+  language: AppLanguage;
+  status: GameStatus;
+  attempts: number;
+  stats: WordleStats;
+  shareStatus: ShareStatus;
+  onShare: () => Promise<void>;
+  onClose: () => void;
+};
 
 export function WordleResultModal({
   open,
@@ -18,69 +22,69 @@ export function WordleResultModal({
   status,
   attempts,
   stats,
+  shareStatus,
+  onShare,
   onClose,
 }: WordleResultModalProps) {
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose()
+      if (event.key === "Escape") {
+        onClose();
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        'keydown',
-        handleKeyDown,
-      )
-    }
-  }, [onClose, open])
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose, open]);
 
   if (!open) {
-    return null
+    return null;
   }
 
   const winPercentage =
     stats.gamesPlayed === 0
       ? 0
-      : Math.round(
-          (stats.gamesWon / stats.gamesPlayed) * 100,
-        )
+      : Math.round((stats.gamesWon / stats.gamesPlayed) * 100);
 
-  const maximumDistribution = Math.max(
-    1,
-    ...stats.guessDistribution,
-  )
+  const maximumDistribution = Math.max(1, ...stats.guessDistribution);
 
   const text =
-    language === 'pl'
+    language === "pl"
       ? {
-          title: 'Statystyki',
+          title: "Statystyki",
           won: `Wygrana w ${attempts}. próbie!`,
-          lost: 'Tym razem się nie udało.',
-          played: 'Gry',
-          winPercentage: 'Wygrane',
-          currentStreak: 'Seria',
-          maxStreak: 'Najlepsza',
-          distribution: 'Rozkład prób',
-          close: 'Zamknij',
+          lost: "Tym razem się nie udało.",
+          played: "Gry",
+          winPercentage: "Wygrane",
+          currentStreak: "Seria",
+          maxStreak: "Najlepsza",
+          distribution: "Rozkład prób",
+          close: "Zamknij",
+          share: "Udostępnij wynik",
+          shared: "Wynik skopiowany",
+          shareError: "Nie udało się skopiować",
         }
       : {
-          title: 'Statistics',
+          title: "Statistics",
           won: `Won in ${attempts} attempts!`,
-          lost: 'Better luck next time.',
-          played: 'Played',
-          winPercentage: 'Win rate',
-          currentStreak: 'Streak',
-          maxStreak: 'Best',
-          distribution: 'Guess distribution',
-          close: 'Close',
-        }
+          lost: "Better luck next time.",
+          played: "Played",
+          winPercentage: "Win rate",
+          currentStreak: "Streak",
+          maxStreak: "Best",
+          distribution: "Guess distribution",
+          close: "Close",
+          share: "Share result",
+          shared: "Result copied",
+          shareError: "Could not copy",
+        };
 
   return (
     <div
@@ -88,7 +92,7 @@ export function WordleResultModal({
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          onClose()
+          onClose();
         }
       }}
     >
@@ -107,45 +111,56 @@ export function WordleResultModal({
               {text.title}
             </h2>
 
-            {status !== 'playing' && (
+            {status !== "playing" && (
               <p className="mt-1 text-sm font-semibold text-(--color-muted)">
-                {status === 'won'
-                  ? text.won
-                  : text.lost}
+                {status === "won" ? text.won : text.lost}
               </p>
             )}
           </div>
 
-          <button
+          <div className="mt-8 grid gap-2 sm:grid-cols-2">
+            {status !== "playing" && (
+              <button
+                type="button"
+                onClick={() => {
+                  void onShare();
+                }}
+                className="w-full rounded-full bg-(--color-correct) px-5 py-3 text-sm font-black text-white transition hover:scale-[1.01]"
+              >
+                {shareStatus === "success"
+                  ? text.shared
+                  : shareStatus === "error"
+                    ? text.shareError
+                    : text.share}
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full rounded-full bg-(--color-text) px-5 py-3 text-sm font-black text-(--color-bg) transition hover:scale-[1.01]"
+            >
+              {text.close}
+            </button>
+          </div>
+          {/* <button
             type="button"
             onClick={onClose}
             aria-label={text.close}
             className="grid size-10 place-items-center rounded-full bg-(--color-surface-strong) text-xl font-bold transition hover:scale-105"
           >
             ×
-          </button>
+          </button> */}
         </div>
 
         <div className="mt-6 grid grid-cols-4 gap-2">
-          <StatItem
-            value={stats.gamesPlayed}
-            label={text.played}
-          />
+          <StatItem value={stats.gamesPlayed} label={text.played} />
 
-          <StatItem
-            value={`${winPercentage}%`}
-            label={text.winPercentage}
-          />
+          <StatItem value={`${winPercentage}%`} label={text.winPercentage} />
 
-          <StatItem
-            value={stats.currentStreak}
-            label={text.currentStreak}
-          />
+          <StatItem value={stats.currentStreak} label={text.currentStreak} />
 
-          <StatItem
-            value={stats.maxStreak}
-            label={text.maxStreak}
-          />
+          <StatItem value={stats.maxStreak} label={text.maxStreak} />
         </div>
 
         <div className="mt-8">
@@ -154,41 +169,32 @@ export function WordleResultModal({
           </h3>
 
           <div className="mt-4 grid gap-2">
-            {stats.guessDistribution.map(
-              (count, index) => {
-                const width =
-                  count === 0
-                    ? 8
-                    : Math.max(
-                        12,
-                        (count /
-                          maximumDistribution) *
-                          100,
-                      )
+            {stats.guessDistribution.map((count, index) => {
+              const width =
+                count === 0
+                  ? 8
+                  : Math.max(12, (count / maximumDistribution) * 100);
 
-                return (
-                  <div
-                    key={index}
-                    className="grid grid-cols-[1.5rem_1fr] items-center gap-2"
-                  >
-                    <span className="text-sm font-bold">
-                      {index + 1}
-                    </span>
+              return (
+                <div
+                  key={index}
+                  className="grid grid-cols-[1.5rem_1fr] items-center gap-2"
+                >
+                  <span className="text-sm font-bold">{index + 1}</span>
 
-                    <div className="h-7 rounded-md bg-(--color-surface-strong)">
-                      <div
-                        className="grid h-full min-w-7 place-items-center rounded-md bg-(--color-correct) px-2 text-xs font-black text-white"
-                        style={{
-                          width: `${width}%`,
-                        }}
-                      >
-                        {count}
-                      </div>
+                  <div className="h-7 rounded-md bg-(--color-surface-strong)">
+                    <div
+                      className="grid h-full min-w-7 place-items-center rounded-md bg-(--color-correct) px-2 text-xs font-black text-white"
+                      style={{
+                        width: `${width}%`,
+                      }}
+                    >
+                      {count}
                     </div>
                   </div>
-                )
-              },
-            )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -201,18 +207,15 @@ export function WordleResultModal({
         </button>
       </section>
     </div>
-  )
+  );
 }
 
 type StatItemProps = {
-  value: number | string
-  label: string
-}
+  value: number | string;
+  label: string;
+};
 
-function StatItem({
-  value,
-  label,
-}: StatItemProps) {
+function StatItem({ value, label }: StatItemProps) {
   return (
     <div className="text-center">
       <p className="text-2xl font-black">{value}</p>
@@ -220,5 +223,5 @@ function StatItem({
         {label}
       </p>
     </div>
-  )
+  );
 }
