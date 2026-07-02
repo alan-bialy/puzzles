@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router'
-import { useSettings } from '../../app/providers/SettingsProvider'
+import { useSettings } from '../../app/providers/SettingsContext'
 import { useTranslation } from '../../config/i18n'
 
 export function AppHeader() {

@@ -1,5 +1,5 @@
-import type { AppLanguage } from "../../app/providers/SettingsProvider";
-import { useSettings } from "../../app/providers/SettingsProvider";
+import type { AppLanguage } from "../../app/providers/SettingsContext";
+import { useSettings } from "../../app/providers/SettingsContext";
 import { useCallback, useState } from "react";
 import { WordleResultModal } from "./components/WordleResultModal";
 import { useWordleStats } from "./hooks/useWordleStats";

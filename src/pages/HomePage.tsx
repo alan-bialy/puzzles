@@ -1,5 +1,5 @@
 import { GameCard } from '../shared/components/GameCard'
-import { useSettings } from '../app/providers/SettingsProvider'
+import { useSettings } from '../app/providers/SettingsContext'
 import { useTranslation } from '../config/i18n'
 
 export function HomePage() {

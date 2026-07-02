@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import type { AppLanguage } from '../../../app/providers/SettingsProvider'
+import type { AppLanguage } from '../../../app/providers/SettingsContext'
 import type { WordleStats } from '../storage/wordleStatsStorage'
 import type { GameStatus } from '../types'
 

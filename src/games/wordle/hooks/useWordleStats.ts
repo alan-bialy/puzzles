@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { AppLanguage } from '../../../app/providers/SettingsProvider'
+import type { AppLanguage } from '../../../app/providers/SettingsContext'
 import {
   loadWordleStats,
   recordWordleResult,

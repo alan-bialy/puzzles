@@ -1,4 +1,4 @@
-import type { AppLanguage } from '../../../app/providers/SettingsProvider'
+import type { AppLanguage } from '../../../app/providers/SettingsContext'
 
 const STORAGE_VERSION = 1
 

@@ -1,9 +1,9 @@
 import type { ChangeEvent } from "react";
-import { useSettings } from "../../app/providers/SettingsProvider";
+import { useSettings } from "../../app/providers/SettingsContext";
 import type {
   AppLanguage,
   AppTheme,
-} from "../../app/providers/SettingsProvider";
+} from "../../app/providers/SettingsContext";
 import { useTranslation } from "../../config/i18n";
 
 export function AppFooter() {

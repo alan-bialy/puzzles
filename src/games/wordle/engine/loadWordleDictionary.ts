@@ -1,5 +1,5 @@
 import { normalizeWord } from '../../../shared/utils/normalizeWord'
-import type { AppLanguage } from '../../../app/providers/SettingsProvider'
+import type { AppLanguage } from '../../../app/providers/SettingsContext'
 import type { WordleDictionary } from '../types'
 
 async function fetchWordList(path: string) {

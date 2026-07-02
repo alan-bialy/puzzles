@@ -1,15 +1,11 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PropsWithChildren } from "react";
-export type AppLanguage = "pl" | "en";
-export type AppTheme = "light" | "dark";
-
-type SettingsContextValue = {
-  language: AppLanguage;
-  theme: AppTheme;
-  setLanguage: (language: AppLanguage) => void;
-  setTheme: (theme: AppTheme) => void;
-  toggleTheme: () => void;
-};
+import {
+  SettingsContext,
+  type AppLanguage,
+  type AppTheme,
+  type SettingsContextValue,
+} from "./SettingsContext";
 
 const SETTINGS_STORAGE_KEY = "puzzles.settings";
 
@@ -17,8 +13,6 @@ type StoredSettings = {
   language?: AppLanguage;
   theme?: AppTheme;
 };
-
-const SettingsContext = createContext<SettingsContextValue | null>(null);
 
 function readStoredSettings(): Required<StoredSettings> {
   try {
@@ -64,18 +58,21 @@ export function SettingsProvider({ children }: PropsWithChildren) {
     () => ({
       language: settings.language,
       theme: settings.theme,
+
       setLanguage: (language) => {
         setSettings((currentSettings) => ({
           ...currentSettings,
           language,
         }));
       },
+
       setTheme: (theme) => {
         setSettings((currentSettings) => ({
           ...currentSettings,
           theme,
         }));
       },
+
       toggleTheme: () => {
         setSettings((currentSettings) => ({
           ...currentSettings,
@@ -91,14 +88,4 @@ export function SettingsProvider({ children }: PropsWithChildren) {
       {children}
     </SettingsContext.Provider>
   );
-}
-
-export function useSettings() {
-  const context = useContext(SettingsContext);
-
-  if (!context) {
-    throw new Error("useSettings must be used inside SettingsProvider");
-  }
-
-  return context;
 }

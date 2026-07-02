@@ -1,4 +1,4 @@
-import type { AppLanguage } from '../../../app/providers/SettingsProvider'
+import type { AppLanguage } from '../../../app/providers/SettingsContext'
 import { getLocalDateKey } from '../../../shared/utils/dateKey'
 import { hashString } from '../../../shared/utils/hashString'
 

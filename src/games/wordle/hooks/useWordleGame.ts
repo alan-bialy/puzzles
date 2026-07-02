@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { AppLanguage } from "../../../app/providers/SettingsProvider";
+import type { AppLanguage } from "../../../app/providers/SettingsContext";
 import { getLocalDateKey } from "../../../shared/utils/dateKey";
 import { normalizeWord } from "../../../shared/utils/normalizeWord";
 import { evaluateGuess } from "../engine/evaluateGuess";
