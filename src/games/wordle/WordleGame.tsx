@@ -9,6 +9,7 @@ import { WordleBoard } from "./components/WordleBoard";
 import { WordleKeyboard } from "./components/WordleKeyboard";
 import { useWordleGame } from "./hooks/useWordleGame";
 import type { WordleGameResult, WordleMessage } from "./types";
+import { useSearchParams } from "react-router";
 
 function getMessageText(message: WordleMessage, language: AppLanguage) {
   if (!message) {
@@ -59,17 +60,38 @@ type WordleGameSessionProps = {
 };
 
 function WordleGameSession({ language }: WordleGameSessionProps) {
-  const [isResultOpen, setIsResultOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const isResultOpen = searchParams.get("modal") === "stats";
 
   const { stats, recordResult } = useWordleStats(language);
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
+
+  const openResultModal = useCallback(() => {
+    const nextSearchParams = new URLSearchParams(searchParams);
+
+    nextSearchParams.set("modal", "stats");
+
+    setSearchParams(nextSearchParams);
+  }, [searchParams, setSearchParams]);
+
+  const closeResultModal = useCallback(() => {
+    const nextSearchParams = new URLSearchParams(searchParams);
+
+    nextSearchParams.delete("modal");
+
+    setSearchParams(nextSearchParams, {
+      replace: true,
+    });
+  }, [searchParams, setSearchParams]);
+
   const handleGameComplete = useCallback(
     (result: WordleGameResult) => {
       recordResult(result);
       setShareStatus("idle");
-      setIsResultOpen(true);
+      openResultModal();
     },
-    [recordResult],
+    [openResultModal, recordResult],
   );
 
   const {
@@ -89,14 +111,10 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
     addLetter,
     removeLetter,
     submitGuess,
-    resetGame,
   } = useWordleGame(language, {
     onComplete: handleGameComplete,
   });
-  const handleReset = useCallback(() => {
-    setIsResultOpen(false);
-    resetGame();
-  }, [resetGame]);
+ 
   const messageText = getMessageText(message, language);
 
   const handleShare = useCallback(async () => {
@@ -158,19 +176,19 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
   return (
     <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-2">
       <div className="mb-5 text-center">
-        <h1 className="text-3xl font-black tracking-tight">Wordle</h1>
+        {/* <h1 className="text-3xl font-black tracking-tight">Wordle</h1> */}
 
-        <p className="mt-2 text-sm text-(--color-muted)">
+        {/* <p className="mt-2 text-sm text-(--color-muted)">
           {language === "pl"
             ? "Odgadnij słowo dnia w sześciu próbach."
             : "Guess the daily word in six tries."}
-        </p>
+        </p> */}
 
-        <p className="mt-2 text-xs font-semibold text-(--color-muted)">
+        {/* <p className="mt-2 text-xs font-semibold text-(--color-muted)">
           {language === "pl"
             ? `Próba ${Math.min(guesses.length + 1, maxAttempts)} z ${maxAttempts}`
             : `Attempt ${Math.min(guesses.length + 1, maxAttempts)} of ${maxAttempts}`}
-        </p>
+        </p> */}
       </div>
 
       <WordleBoard
@@ -198,28 +216,6 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
         disabled={status !== "playing" || isInputLocked}
       />
 
-      <div className="mx-auto mt-6 flex items-center justify-center gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            setShareStatus("idle");
-            setIsResultOpen(true);
-          }}
-          className="rounded-full px-4 py-2 text-xs font-bold text-(--color-muted) transition hover:bg-(--color-surface-strong) hover:text-(--color-text)"
-        >
-          {language === "pl" ? "Statystyki" : "Statistics"}
-        </button>
-
-        {import.meta.env.DEV && (
-          <button
-            type="button"
-            onClick={handleReset}
-            className="rounded-full px-4 py-2 text-xs font-bold text-(--color-muted) transition hover:bg-(--color-surface-strong) hover:text-(--color-text)"
-          >
-            {language === "pl" ? "Resetuj postęp" : "Reset progress"}
-          </button>
-        )}
-      </div>
 
       <WordleResultModal
         open={isResultOpen}
@@ -229,7 +225,7 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
         stats={stats}
         shareStatus={shareStatus}
         onShare={handleShare}
-        onClose={() => setIsResultOpen(false)}
+        onClose={closeResultModal}
       />
     </section>
   );

@@ -22,7 +22,9 @@ export function HomePage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* <div className="grid gap-4 sm:grid-cols-2"> */}
+      <div className="grid gap-2 sm:grid-cols-2 ">
+       
         <GameCard
           title={t.wordleTitle}
           description={t.wordleDescription}
@@ -30,12 +32,12 @@ export function HomePage() {
           to="/wordle"
         />
 
-        <GameCard
+         <GameCard
           title={t.comingSoonTitle}
           description={t.comingSoonDescription}
           actionLabel={t.soon}
           disabled
-        />
+        /> 
       </div>
     </section>
   )

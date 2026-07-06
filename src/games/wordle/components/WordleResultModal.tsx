@@ -125,7 +125,7 @@ export function WordleResultModal({
                 onClick={() => {
                   void onShare();
                 }}
-                className="w-full rounded-full bg-(--color-correct) px-5 py-3 text-sm font-black text-white transition hover:scale-[1.01]"
+                className="cursor-pointer w-full rounded-full bg-(--color-correct) px-5 py-3 text-sm font-black text-white transition hover:scale-[1.01]"
               >
                 {shareStatus === "success"
                   ? text.shared
@@ -201,7 +201,7 @@ export function WordleResultModal({
         <button
           type="button"
           onClick={onClose}
-          className="mt-8 w-full rounded-full bg-(--color-text) px-5 py-3 text-sm font-black text-(--color-bg) transition hover:scale-[1.01]"
+          className="cursor-pointer mt-8 w-full rounded-full bg-(--color-text) px-5 py-3 text-sm font-black text-(--color-bg) transition hover:scale-[1.01]"
         >
           {text.close}
         </button>

@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router'
 import { AppHeader } from '../shared/components/AppHeader'
-import { AppFooter } from '../shared/components/AppFooter'
 
 export function AppLayout() {
   return (
@@ -12,7 +11,6 @@ export function AppLayout() {
           <Outlet />
         </main>
 
-        <AppFooter />
       </div>
     </div>
   )

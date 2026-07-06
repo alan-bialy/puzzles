@@ -10,7 +10,7 @@ type WordleKeyboardProps = {
 }
 
 const keyboardLayouts = {
-  pl: ['qwertyuiop', 'asdfghjkl', 'zxcvbnmąćęłńóśźż'],
+  pl: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm','ąćęłńóśźż'],
   en: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'],
 }
 
@@ -42,7 +42,7 @@ export function WordleKeyboard({
                 disabled={disabled}
                 onClick={() => onLetter(letter)}
                 className={[
-                  'min-h-11 min-w-8 flex-1 rounded-lg px-2 text-sm font-black uppercase transition active:scale-95 disabled:opacity-60 sm:min-h-12',
+                  'cursor-pointer min-h-11 min-w-8 flex-1 rounded-lg px-2 text-sm font-black uppercase transition active:scale-95 disabled:opacity-60 sm:min-h-12',
                   state
                     ? stateClassName[state]
                     : 'bg-(--color-surface-strong) text-(--color-text)',
@@ -60,7 +60,7 @@ export function WordleKeyboard({
           type="button"
           disabled={disabled}
           onClick={onEnter}
-          className="min-h-11 flex-1 rounded-lg bg-(--color-text) px-3 text-xs font-black uppercase text-(--color-bg) active:scale-95 disabled:opacity-60 sm:text-sm"
+          className="cursor-pointer min-h-11 flex-1 rounded-lg bg-(--color-text) px-3 text-xs font-black uppercase text-(--color-bg) active:scale-95 disabled:opacity-60 sm:text-sm"
         >
           Enter
         </button>
@@ -69,7 +69,7 @@ export function WordleKeyboard({
           type="button"
           disabled={disabled}
           onClick={onBackspace}
-          className="min-h-11 flex-1 rounded-lg bg-(--color-surface-strong) px-3 text-xs font-black uppercase text-(--color-text) active:scale-95 disabled:opacity-60 sm:text-sm"
+          className="cursor-pointer min-h-11 flex-1 rounded-lg bg-(--color-surface-strong) px-3 text-xs font-black uppercase text-(--color-text) active:scale-95 disabled:opacity-60 sm:text-sm"
         >
           Backspace
         </button>

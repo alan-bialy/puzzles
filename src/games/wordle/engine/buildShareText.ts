@@ -25,9 +25,8 @@ export function buildShareText({
 }: BuildShareTextOptions) {
   const score = status === "won" ? guesses.length : "X";
 
-//   const title = language === "pl" ? "Puzzles — Słówko" : "Puzzles — Daily Word";
-   const title = language === "pl" ? "Wordle" : "Wordle";
-
+  //   const title = language === "pl" ? "Puzzles — Słówko" : "Puzzles — Daily Word";
+  const title = language === "pl" ? "Wordle" : "Wordle";
 
   const grid = guesses
     .map((guess) => guess.map((tile) => stateSymbols[tile.state]).join(""))
@@ -35,6 +34,7 @@ export function buildShareText({
 
   const lines = [`${title} ${score}/${maxAttempts}`, dateKey, "", grid];
 
+  url = "";
   if (url) {
     lines.push("", url);
   }
