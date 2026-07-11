@@ -30,14 +30,16 @@
   --color-focus: #64748b;
 
   --color-surface: #0f172a;
-  --color-surface-strong: #1e293b;
+  --color-surface-strong: #475569;
 
-  --color-tile-empty: #0f172a;
+
+  --color-tile-empty: #020617;
   --color-tile-border: #334155;
 
   --color-correct: #22c55e;
   --color-present: #eab308;
-  --color-absent: #475569;
+  --color-absent: #1e293b;
+
 }
 
 * {
@@ -135,11 +137,11 @@ select {
 
 @keyframes wordle-pop {
   0% {
-    transform: scale(0.7);
+    transform: scale(0.8);
   }
 
   55% {
-    transform: scale(1.14);
+    transform: scale(1.08);
   }
 
   75% {
@@ -188,35 +190,35 @@ select {
   }
 
   10% {
-    transform: translateX(-12px) rotate(-1deg);
+    transform: translateX(-9px) rotate(-1deg);
   }
 
   20% {
-    transform: translateX(12px) rotate(1deg);
+    transform: translateX(9px) rotate(1deg);
   }
 
   30% {
-    transform: translateX(-10px);
+    transform: translateX(-6px);
   }
 
   40% {
-    transform: translateX(10px);
+    transform: translateX(6px);
   }
 
   50% {
-    transform: translateX(-7px);
+    transform: translateX(-4px);
   }
 
   60% {
-    transform: translateX(7px);
+    transform: translateX(4px);
   }
 
   75% {
-    transform: translateX(-3px);
+    transform: translateX(-2px);
   }
 
   90% {
-    transform: translateX(3px);
+    transform: translateX(2px);
   }
 }
 
@@ -249,16 +251,3 @@ select {
   }
 }
 
-/* @media (prefers-reduced-motion: reduce) {
-  .wordle-tile--pop,
-  .wordle-tile--revealing,
-  .wordle-tile--bounce,
-  .wordle-row-shake {
-    animation-duration: 1ms !important;
-    animation-delay: 0ms !important;
-  }
-} */
-
-.xd:hover {
-    cursor: pointer;
-}
