@@ -20,7 +20,9 @@ type TranslationKey =
   | "dark"
   | "backHome"
   | "notFoundTitle"
-  | "notFoundDescription";
+  | "notFoundDescription"
+  | "dinoFlightTitle"
+  | "dinoFlightDescription";
 
 export const translations: Record<
   AppLanguage,
@@ -48,6 +50,8 @@ export const translations: Record<
     statistics: "Statystyki",
     enableDarkTheme: "Włącz ciemny motyw",
     enableLightTheme: "Włącz jasny motyw",
+    dinoFlightTitle: 'Flappy Dino',
+    dinoFlightDescription: 'Przeżyj jak najdłużej.',
   },
   en: {
     appName: "Wordle",
@@ -71,6 +75,8 @@ export const translations: Record<
     statistics: "Statistics",
     enableDarkTheme: "Enable dark theme",
     enableLightTheme: "Enable light theme",
+    dinoFlightTitle: 'Flappy Dino',
+    dinoFlightDescription: 'Stay alive as long as you can.',
   },
 };
 

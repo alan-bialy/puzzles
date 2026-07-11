@@ -251,3 +251,10 @@ select {
   }
 }
 
+canvas {
+  image-rendering: pixelated;
+}
+
+button {
+  touch-action: manipulation;
+}

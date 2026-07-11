@@ -6,6 +6,8 @@ import { AppLayout } from  './AppLayout'
 import { HomePage } from '../pages/HomePage'
 import { WordlePage } from '../pages/WordlePage'
 import { NotFoundPage } from  '../pages/NotFoundPage'
+import { DinoFlightPage } from '../pages/DinoFlightPage'
+
 
 export function App() {
   return (
@@ -13,6 +15,8 @@ export function App() {
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
         <Route path="wordle" element={<WordlePage />} />
+        <Route path="flappy-dino" element={<DinoFlightPage />} />
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

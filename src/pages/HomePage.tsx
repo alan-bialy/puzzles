@@ -1,10 +1,10 @@
-import { GameCard } from '../shared/components/GameCard'
-import { useSettings } from '../app/providers/SettingsContext'
-import { useTranslation } from '../config/i18n'
+import { GameCard } from "../shared/components/GameCard";
+import { useSettings } from "../app/providers/SettingsContext";
+import { useTranslation } from "../config/i18n";
 
 export function HomePage() {
-  const { language } = useSettings()
-  const t = useTranslation(language)
+  const { language } = useSettings();
+  const t = useTranslation(language);
 
   return (
     <section className="flex flex-1 flex-col">
@@ -24,21 +24,26 @@ export function HomePage() {
 
       {/* <div className="grid gap-4 sm:grid-cols-2"> */}
       <div className="grid gap-2 sm:grid-cols-2 ">
-       
         <GameCard
           title={t.wordleTitle}
           description={t.wordleDescription}
           actionLabel={t.play}
           to="/wordle"
         />
+        <GameCard
+          title={t.dinoFlightTitle}
+          description={t.dinoFlightDescription}
+          actionLabel={t.play}
+          to="/flappy-dino"
+        />
 
-         <GameCard
+        <GameCard
           title={t.comingSoonTitle}
           description={t.comingSoonDescription}
           actionLabel={t.soon}
           disabled
-        /> 
+        />
       </div>
     </section>
-  )
+  );
 }
