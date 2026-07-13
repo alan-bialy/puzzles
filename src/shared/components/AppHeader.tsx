@@ -34,7 +34,7 @@ export function AppHeader() {
             to="/"
             className="shrink-0 text-lg font-black tracking-tight sm:text-xl"
           >
-            {t.appName}
+            {t.pageTitleHome}
           </Link>
 
           {/* <div className="hidden items-center gap-1 sm:flex">

@@ -1,16 +1,19 @@
-import { Link } from 'react-router'
-import { useSettings } from '../app/providers/SettingsContext'
-import { useTranslation } from '../config/i18n'
+import { Link } from "react-router";
+import { useSettings } from "../app/providers/SettingsContext";
+import { useTranslation } from "../config/i18n";
+import { usePageTitle } from "../shared/hooks/usePageTitle";
 
 export function NotFoundPage() {
-  const { language } = useSettings()
-  const t = useTranslation(language)
-
+  const { language } = useSettings();
+  const t = useTranslation(language);
+  usePageTitle(t.pageTitleNotFound);
   return (
     <section className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center text-center">
       <p className="text-7xl font-black">404</p>
 
-      <h1 className="mt-6 text-3xl font-black tracking-tight">{t.notFoundTitle}</h1>
+      <h1 className="mt-6 text-3xl font-black tracking-tight">
+        {t.notFoundTitle}
+      </h1>
 
       <p className="mt-3 text-sm leading-6 text-(--color-muted)">
         {t.notFoundDescription}
@@ -23,5 +26,5 @@ export function NotFoundPage() {
         {t.backHome}
       </Link>
     </section>
-  )
+  );
 }

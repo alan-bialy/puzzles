@@ -22,14 +22,17 @@ type TranslationKey =
   | "notFoundTitle"
   | "notFoundDescription"
   | "dinoFlightTitle"
-  | "dinoFlightDescription";
-
+  | "dinoFlightDescription"
+  | "pageTitleHome"
+  | "pageTitleWordle"
+  | "pageTitleDinoFlight"
+  | "pageTitleNotFound";
 export const translations: Record<
   AppLanguage,
   Record<TranslationKey, string>
 > = {
   pl: {
-    appName: "Wordle",
+    appName: "Minigierki",
     homeTitle: "Codzienne łamigłówki",
     homeSubtitle: "Wybierz grę i baw się dobrze",
     play: "Graj",
@@ -50,11 +53,15 @@ export const translations: Record<
     statistics: "Statystyki",
     enableDarkTheme: "Włącz ciemny motyw",
     enableLightTheme: "Włącz jasny motyw",
-    dinoFlightTitle: 'Flappy Dino',
-    dinoFlightDescription: 'Przeżyj jak najdłużej.',
+    dinoFlightTitle: "Flappy Dino",
+    dinoFlightDescription: "Przeżyj jak najdłużej.",
+    pageTitleHome: "Minigierki",
+    pageTitleWordle: "Wordle",
+    pageTitleDinoFlight: "Flappy Dino",
+    pageTitleNotFound: "Nie znaleziono strony",
   },
   en: {
-    appName: "Wordle",
+    appName: "Minigames",
     homeTitle: "Daily puzzles",
     homeSubtitle: "Choose a game and have fun",
     play: "Play",
@@ -75,8 +82,12 @@ export const translations: Record<
     statistics: "Statistics",
     enableDarkTheme: "Enable dark theme",
     enableLightTheme: "Enable light theme",
-    dinoFlightTitle: 'Flappy Dino',
-    dinoFlightDescription: 'Stay alive as long as you can.',
+    dinoFlightTitle: "Flappy Dino",
+    dinoFlightDescription: "Stay alive as long as you can.",
+    pageTitleHome: "Minigames",
+    pageTitleWordle: "Wordle",
+    pageTitleDinoFlight: "Flappy Dino",
+    pageTitleNotFound: "Page not found",
   },
 };
 
