@@ -21,13 +21,15 @@ type GameModel = {
   bestScore: number;
   lastFrameTime: number;
   lastFlapTime: number;
+  backgroundOffset: number;
 };
 
 const BEST_SCORE_STORAGE_KEY = "puzzles.dino-flight.best-score";
 
 type DinoFlightAssets = {
+  background: HTMLImageElement;
   wall: HTMLImageElement;
-  dinoFrames: [HTMLImageElement, HTMLImageElement];
+  dinoFrames: [HTMLImageElement, HTMLImageElement, HTMLImageElement];
 };
 
 function getAssetUrl(path: string) {
@@ -45,15 +47,19 @@ function loadImage(src: string) {
 }
 
 async function loadDinoFlightAssets(): Promise<DinoFlightAssets> {
-  const [wall, dinoFrameOne, dinoFrameTwo] = await Promise.all([
-    loadImage(config.assets.wall),
-    loadImage(config.assets.dinoFrames[0]),
-    loadImage(config.assets.dinoFrames[1]),
-  ]);
+  const [background, wall, dinoFrameOne, dinoFrameTwo, dinoFrameThree] =
+    await Promise.all([
+      loadImage(config.assets.background),
+      loadImage(config.assets.wall),
+      loadImage(config.assets.dinoFrames[0]),
+      loadImage(config.assets.dinoFrames[1]),
+      loadImage(config.assets.dinoFrames[2]),
+    ]);
 
   return {
+    background,
     wall,
-    dinoFrames: [dinoFrameOne, dinoFrameTwo],
+    dinoFrames: [dinoFrameOne, dinoFrameTwo, dinoFrameThree],
   };
 }
 
@@ -104,6 +110,7 @@ function createInitialModel(): GameModel {
     bestScore: readBestScore(),
     lastFrameTime: 0,
     lastFlapTime: 0,
+    backgroundOffset: 0,
   };
 }
 
@@ -118,6 +125,7 @@ function resetModel(model: GameModel, phase: GamePhase = "ready") {
     createWall(config.canvasWidth + 120 + config.wallSpacing * 2),
   ];
   model.lastFlapTime = 0;
+  model.backgroundOffset = 0;
 }
 
 function doesDinoHitWall(model: GameModel) {
@@ -146,29 +154,71 @@ function doesDinoHitWall(model: GameModel) {
   });
 }
 
-function drawPixelBackground(ctx: CanvasRenderingContext2D, time: number) {
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, config.canvasWidth, config.canvasHeight);
-
-  ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
-
-  for (let x = 0; x < config.canvasWidth; x += 24) {
-    const offset = (time / 24 + x * 3) % config.canvasHeight;
-
-    for (let y = -config.canvasHeight; y < config.canvasHeight; y += 72) {
-      ctx.fillRect(x, y + offset, 3, 8);
-    }
+function drawScrollingBackground(
+  ctx: CanvasRenderingContext2D,
+  backgroundImage: HTMLImageElement | undefined,
+  offset: number,
+) {
+  if (!backgroundImage) {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, config.canvasWidth, config.canvasHeight);
+    return;
   }
 
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-  ctx.lineWidth = 1;
+  const imageWidth = backgroundImage.naturalWidth || backgroundImage.width;
+  const imageHeight = backgroundImage.naturalHeight || backgroundImage.height;
 
-  for (let y = 0; y < config.canvasHeight; y += 24) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(config.canvasWidth, y);
-    ctx.stroke();
+  if (imageWidth <= 0 || imageHeight <= 0) {
+    return;
   }
+
+  const coverScale =
+    Math.max(
+      config.canvasWidth / imageWidth,
+      config.canvasHeight / imageHeight,
+    ) * config.backgroundZoom;
+
+  const drawWidth = imageWidth * coverScale;
+  const drawHeight = imageHeight * coverScale;
+
+  const drawY = (config.canvasHeight - drawHeight) / 2;
+
+  const normalizedOffset = ((offset % drawWidth) + drawWidth) % drawWidth;
+
+  ctx.save();
+
+  ctx.imageSmoothingEnabled = true;
+
+  ctx.drawImage(
+    backgroundImage,
+    -drawWidth + normalizedOffset,
+    drawY,
+    drawWidth,
+    drawHeight,
+  );
+
+  ctx.drawImage(
+    backgroundImage,
+    normalizedOffset,
+    drawY,
+    drawWidth,
+    drawHeight,
+  );
+
+  ctx.drawImage(
+    backgroundImage,
+    drawWidth + normalizedOffset,
+    drawY,
+    drawWidth,
+    drawHeight,
+  );
+
+  if (config.backgroundOverlayOpacity > 0) {
+    ctx.fillStyle = `rgba(0, 0, 0, ${config.backgroundOverlayOpacity})`;
+    ctx.fillRect(0, 0, config.canvasWidth, config.canvasHeight);
+  }
+
+  ctx.restore();
 }
 
 function drawTiledImage(
@@ -226,6 +276,20 @@ function drawTexturedWall(
     wall.textureOffsetX,
     wall.textureOffsetY + y,
   );
+
+  if (config.wallBorderWidth > 0) {
+    ctx.strokeStyle = config.wallBorderColor;
+    ctx.lineWidth = config.wallBorderWidth;
+
+    const inset = config.wallBorderWidth / 2;
+
+    ctx.strokeRect(
+      wall.x + inset,
+      y + inset,
+      config.wallWidth - config.wallBorderWidth,
+      height - config.wallBorderWidth,
+    );
+  }
 }
 
 function drawWalls(
@@ -252,17 +316,38 @@ function drawWalls(
   });
 }
 
+function getDinoFrameIndex(model: GameModel, time: number) {
+  if (model.phase !== "playing") {
+    return 0;
+  }
+
+  const elapsedSinceFlap = time - model.lastFlapTime;
+
+  if (elapsedSinceFlap < 0 || elapsedSinceFlap > config.flapFrameDurationMs) {
+    return 0;
+  }
+
+  const progress = elapsedSinceFlap / config.flapFrameDurationMs;
+
+  if (progress < 0.33) {
+    return 1;
+  }
+
+  if (progress < 0.66) {
+    return 2;
+  }
+
+  return 1;
+}
+
 function drawDino(
   ctx: CanvasRenderingContext2D,
   model: GameModel,
   time: number,
   assets: DinoFlightAssets | null,
 ) {
-  const useFlapFrame =
-    model.phase === "playing" &&
-    time - model.lastFlapTime < config.flapFrameDurationMs;
-
-  const frame = assets?.dinoFrames[useFlapFrame ? 1 : 0];
+  const frameIndex = getDinoFrameIndex(model, time);
+  const frame = assets?.dinoFrames[frameIndex];
 
   if (!frame) {
     ctx.fillStyle = "#fff";
@@ -290,14 +375,27 @@ function drawGame(
   time: number,
   assets: DinoFlightAssets | null,
 ) {
-  drawPixelBackground(ctx, time);
+  drawScrollingBackground(ctx, assets?.background, model.backgroundOffset);
+
+  ctx.imageSmoothingEnabled = false;
+
   drawWalls(ctx, model.walls, assets);
   drawDino(ctx, model, time, assets);
 }
+
 function updateGame(model: GameModel, frameScale: number) {
   if (model.phase !== "playing") {
     return;
   }
+
+  const backgroundDirectionMultiplier =
+    config.backgroundDirection === "left-to-right" ? 1 : -1;
+
+  model.backgroundOffset +=
+    backgroundDirectionMultiplier *
+    config.backgroundSpeed *
+    (1000 / 60) *
+    frameScale;
 
   model.velocity = Math.min(
     model.velocity + config.gravity * frameScale,
@@ -354,17 +452,18 @@ export function DinoFlightGame() {
   const text =
     language === "pl"
       ? {
-          title: "Dino Flight",
-          description: "Kliknij albo wciśnij spację, żeby poderwać dinozaura.",
-          ready: "Kliknij, żeby zacząć",
+          title: "Flappy Dino",
+          description:
+            "Kliknij albo naciśnij spację, aby wzbić dinozaura w górę",
+          ready: "Kliknij, aby zacząć",
           gameOver: "Koniec gry",
-          restart: "Kliknij, żeby zagrać ponownie",
+          restart: "Kliknij, aby zagrać ponownie",
           score: "Wynik",
           best: "Rekord",
         }
       : {
-          title: "Dino Flight",
-          description: "Click or press space to lift the dinosaur.",
+          title: "Flappy Dino",
+          description: "Click or press space to make the dinosaur fly",
           ready: "Click to start",
           gameOver: "Game over",
           restart: "Click to play again",
@@ -541,7 +640,7 @@ export function DinoFlightGame() {
       <button
         type="button"
         onPointerDown={flap}
-        className="relative w-full max-w-sm touch-manipulation overflow-hidden rounded-3xl border border-white/20 bg-black shadow-2xl outline-none active:scale-[0.99]"
+        className="relative w-full max-w-sm touch-manipulation overflow-hidden rounded-3xl border border-white/20 bg-black shadow-2xl outline-none active:scale-[0.996]"
       >
         <canvas
           ref={canvasRef}

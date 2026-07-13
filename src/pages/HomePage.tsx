@@ -35,14 +35,16 @@ export function HomePage() {
           description={t.dinoFlightDescription}
           actionLabel={t.play}
           to="/flappy-dino"
+          imageSrc="assets/dino-flight/flappydino.png"
+          imageAlt={t.dinoFlightTitle}
         />
 
-        <GameCard
+        {/* <GameCard
           title={t.comingSoonTitle}
           description={t.comingSoonDescription}
           actionLabel={t.soon}
           disabled
-        />
+        /> */}
       </div>
     </section>
   );

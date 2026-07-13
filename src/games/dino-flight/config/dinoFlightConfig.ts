@@ -1,32 +1,41 @@
 export type DinoFlightConfig = {
-  canvasWidth: number
-  canvasHeight: number
+  canvasWidth: number;
+  canvasHeight: number;
 
-  gravity: number
-  flapVelocity: number
-  maxFallVelocity: number
+  gravity: number;
+  flapVelocity: number;
+  maxFallVelocity: number;
 
-  dinoX: number
-  dinoWidth: number
-  dinoHeight: number
-  flapFrameDurationMs: number
+  dinoX: number;
+  dinoWidth: number;
+  dinoHeight: number;
+  flapFrameDurationMs: number;
 
-  wallWidth: number
-  wallGapHeight: number
-  wallSpacing: number
-  wallSpeed: number
-  wallTextureScale: number
+  wallWidth: number;
+  wallGapHeight: number;
+  wallSpacing: number;
+  wallSpeed: number;
+  wallTextureScale: number;
 
-  minGapTop: number
-  bottomPadding: number
+  backgroundSpeed: number;
+  backgroundZoom: number;
+  backgroundDirection: "left-to-right" | "right-to-left";
+  backgroundOverlayOpacity: number;
 
-  pixelSize: number
+  minGapTop: number;
+  bottomPadding: number;
+
+  pixelSize: number;
+
+  wallBorderWidth: number;
+  wallBorderColor: string;
 
   assets: {
-    wall: string
-    dinoFrames: [string, string]
-  }
-}
+    background: string;
+    wall: string;
+    dinoFrames: [string, string, string];
+  };
+};
 
 export const dinoFlightConfig: DinoFlightConfig = {
   canvasWidth: 360,
@@ -39,9 +48,22 @@ export const dinoFlightConfig: DinoFlightConfig = {
   dinoX: 78,
   dinoWidth: 52,
   dinoHeight: 43,
-//   dinoWidth: 46,
-//   dinoHeight: 38,
-  flapFrameDurationMs: 160,
+  //   dinoWidth: 46,
+  //   dinoHeight: 38,
+  flapFrameDurationMs: 190,
+
+  backgroundSpeed: 0.045,
+  backgroundZoom: 3.08,
+  backgroundDirection: "right-to-left",
+  backgroundOverlayOpacity: 0.22,
+
+  minGapTop: 72,
+  bottomPadding: 36,
+
+  pixelSize: 6,
+
+  wallBorderWidth: 1,
+  wallBorderColor: "rgba(0, 0, 0, 0.9)",
 
   wallWidth: 56,
   wallGapHeight: 150,
@@ -49,16 +71,14 @@ export const dinoFlightConfig: DinoFlightConfig = {
   wallSpeed: 2.75,
   wallTextureScale: 0.12,
 
-  minGapTop: 72,
-  bottomPadding: 36,
-
-  pixelSize: 6,
 
   assets: {
-    wall: 'assets/dino-flight/wall1.png',
+    background: "assets/dino-flight/bg1.png",
+    wall: "assets/dino-flight/wall2.png",
     dinoFrames: [
-      'assets/dino-flight/dino1.png',
-      'assets/dino-flight/dino2.png',
+      "assets/dino-flight/dd1.png",
+      "assets/dino-flight/dd2.png",
+      "assets/dino-flight/dd2.png",
     ],
   },
-}
+};
