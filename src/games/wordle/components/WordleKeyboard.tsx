@@ -10,8 +10,17 @@ type WordleKeyboardProps = {
 }
 
 const keyboardLayouts = {
-  pl: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm','ąćęłńóśźż'],
-  en: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'],
+  pl: [
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+    ['ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż'],
+  ],
+  en: [
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+  ],
 }
 
 const stateClassName: Record<LetterState, string> = {
@@ -29,10 +38,16 @@ export function WordleKeyboard({
   disabled = false,
 }: WordleKeyboardProps) {
   return (
-    <div className="mx-auto mt-6 grid w-full max-w-xl gap-2">
+    <div className="mx-auto mt-4 grid w-full max-w-md gap-1.5 px-0 sm:mt-6 sm:max-w-xl sm:gap-2">
       {keyboardLayouts[language].map((row) => (
-        <div key={row} className="flex justify-center gap-1.5">
-          {Array.from(row).map((letter) => {
+        <div
+          key={row.join('')}
+          className="grid gap-1 sm:gap-1.5"
+          style={{
+            gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))`,
+          }}
+        >
+          {row.map((letter) => {
             const state = usedLetters[letter]
 
             return (
@@ -42,7 +57,7 @@ export function WordleKeyboard({
                 disabled={disabled}
                 onClick={() => onLetter(letter)}
                 className={[
-                  'cursor-pointer min-h-11 min-w-8 flex-1 rounded-lg px-2 text-sm font-black uppercase transition active:scale-95 disabled:opacity-60 sm:min-h-12',
+                  'grid h-9 min-w-0 place-items-center rounded-md px-0 text-[0.7rem] font-black uppercase transition active:scale-95 disabled:opacity-60 sm:h-12 sm:rounded-lg sm:text-sm',
                   state
                     ? stateClassName[state]
                     : 'bg-(--color-surface-strong) text-(--color-text)',
@@ -55,12 +70,12 @@ export function WordleKeyboard({
         </div>
       ))}
 
-      <div className="flex justify-center gap-2">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
         <button
           type="button"
           disabled={disabled}
           onClick={onEnter}
-          className="cursor-pointer min-h-11 flex-1 rounded-lg bg-(--color-text) px-3 text-xs font-black uppercase text-(--color-bg) active:scale-95 disabled:opacity-60 sm:text-sm"
+          className="h-10 rounded-md bg-(--color-text) px-3 text-xs font-black uppercase text-(--color-bg) active:scale-95 disabled:opacity-60 sm:h-12 sm:rounded-lg sm:text-sm"
         >
           Enter
         </button>
@@ -69,7 +84,8 @@ export function WordleKeyboard({
           type="button"
           disabled={disabled}
           onClick={onBackspace}
-          className="cursor-pointer min-h-11 flex-1 rounded-lg bg-(--color-surface-strong) px-3 text-xs font-black uppercase text-(--color-text) active:scale-95 disabled:opacity-60 sm:text-sm"
+          aria-label="Backspace"
+          className="h-10 rounded-md bg-(--color-surface-strong) px-3 text-xs font-black uppercase text-(--color-text) active:scale-95 disabled:opacity-60 sm:h-12 sm:rounded-lg sm:text-sm"
         >
           Backspace
         </button>

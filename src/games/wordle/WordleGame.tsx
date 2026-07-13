@@ -174,8 +174,8 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-2">
-      <div className="mb-5 text-center">
+    <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-start py-0 sm:justify-center sm:py-2">
+      <div className="mb-3 text-center sm:mb-5">
         {/* <h1 className="text-3xl font-black tracking-tight">Wordle</h1> */}
 
         {/* <p className="mt-2 text-sm text-(--color-muted)">

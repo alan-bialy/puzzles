@@ -31,6 +31,7 @@ export function WordleBoard({
 
   return (
     <div className="mx-auto grid w-full max-w-sm gap-2">
+  {/* <div className="mx-auto grid w-full max-w-76 gap-1.5 sm:max-w-sm sm:gap-2"> */}
       {rows.map((_, rowIndex) => {
         const evaluatedGuess = guesses[rowIndex];
         const isCurrentRow = rowIndex === guesses.length;
