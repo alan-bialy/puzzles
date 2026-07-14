@@ -1,12 +1,12 @@
 import { GameCard } from "../shared/components/GameCard";
 import { useSettings } from "../app/providers/SettingsContext";
 import { useTranslation } from "../config/i18n";
-import { usePageTitle } from '../shared/hooks/usePageTitle'
+import { usePageTitle } from "../shared/hooks/usePageTitle";
 
 export function HomePage() {
   const { language } = useSettings();
   const t = useTranslation(language);
-  usePageTitle(t.pageTitleHome)
+  usePageTitle(t.pageTitleHome);
 
   return (
     <section className="flex flex-1 flex-col">
@@ -19,9 +19,9 @@ export function HomePage() {
           {t.homeSubtitle}
         </h1>
 
-         <p className="mt-4 max-w-xl text-base leading-7 text-(--color-muted) sm:text-lg">
-         {/* {t.homeSubtitle}*/}
-        </p> 
+        <p className="mt-4 max-w-xl text-base leading-7 text-(--color-muted) sm:text-lg">
+          {/* {t.homeSubtitle}*/}
+        </p>
       </div>
 
       {/* <div className="grid gap-4 sm:grid-cols-2"> */}
@@ -31,6 +31,7 @@ export function HomePage() {
           description={t.wordleDescription}
           actionLabel={t.play}
           to="/wordle"
+          eventName="open_wordle"
         />
         <GameCard
           title={t.dinoFlightTitle}
@@ -39,6 +40,7 @@ export function HomePage() {
           to="/flappy-dino"
           imageSrc="assets/dino-flight/flappydino.png"
           imageAlt={t.dinoFlightTitle}
+          eventName="open_flappy_dino"
         />
 
         {/* <GameCard

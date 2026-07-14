@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettings } from "../../app/providers/SettingsContext";
 import { dinoFlightConfig as config } from "./config/dinoFlightConfig";
+import { trackEvent } from "../../shared/analytics/trackEvent";
 
 type GamePhase = "ready" | "playing" | "game-over";
 
@@ -427,6 +428,11 @@ function updateGame(model: GameModel, frameScale: number) {
 
   if (doesDinoHitWall(model)) {
     model.phase = "game-over";
+
+    trackEvent("dino_flight_game_over", {
+      score: model.score,
+      bestScore: Math.max(model.bestScore, model.score),
+    });
 
     if (model.score > model.bestScore) {
       model.bestScore = model.score;

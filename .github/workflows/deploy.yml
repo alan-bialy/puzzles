@@ -43,7 +43,8 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_PATH: "/${{ github.event.repository.name }}/"
-
+          VITE_UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
+          VITE_UMAMI_SRC: ${{ vars.UMAMI_SRC }}
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

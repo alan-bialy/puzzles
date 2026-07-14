@@ -10,6 +10,7 @@ import { WordleKeyboard } from "./components/WordleKeyboard";
 import { useWordleGame } from "./hooks/useWordleGame";
 import type { WordleGameResult, WordleMessage } from "./types";
 import { useSearchParams } from "react-router";
+import { trackEvent } from "../../shared/analytics/trackEvent";
 
 function getMessageText(message: WordleMessage, language: AppLanguage) {
   if (!message) {
@@ -88,10 +89,17 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
   const handleGameComplete = useCallback(
     (result: WordleGameResult) => {
       recordResult(result);
+
+      trackEvent("word_game_complete", {
+        language,
+        won: result.won,
+        attempts: result.attempts,
+      });
+
       setShareStatus("idle");
       openResultModal();
     },
-    [openResultModal, recordResult],
+    [language, openResultModal, recordResult],
   );
 
   const {
@@ -114,7 +122,7 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
   } = useWordleGame(language, {
     onComplete: handleGameComplete,
   });
- 
+
   const messageText = getMessageText(message, language);
 
   const handleShare = useCallback(async () => {
@@ -215,7 +223,6 @@ function WordleGameSession({ language }: WordleGameSessionProps) {
         onEnter={submitGuess}
         disabled={status !== "playing" || isInputLocked}
       />
-
 
       <WordleResultModal
         open={isResultOpen}
